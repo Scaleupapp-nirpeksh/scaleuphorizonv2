@@ -6,3 +6,11 @@ export {
   unhandledRejectionHandler,
   uncaughtExceptionHandler,
 } from './error.middleware';
+export {
+  uploadSingle,
+  uploadMultiple,
+  uploadFields,
+  uploadToMemory,
+  uploadPresets,
+  handleUploadError,
+} from './upload.middleware';

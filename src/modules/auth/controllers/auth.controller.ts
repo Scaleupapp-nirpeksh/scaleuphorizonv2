@@ -96,19 +96,7 @@ export class AuthController {
   forgotPassword = asyncHandler(
     async (req: Request<object, object, ForgotPasswordInput>, res: Response) => {
       const result = await authService.forgotPassword(req.body.email);
-
-      // In production, send email instead of returning token
-      // For development, we return the token
-      if (process.env.NODE_ENV === 'development') {
-        sendSuccess(res, {
-          message: 'Password reset link sent to email',
-          // Only include token in development for testing
-          devToken: result.token,
-          expiresAt: result.expiresAt,
-        });
-      } else {
-        sendMessage(res, 'If the email exists, a password reset link has been sent');
-      }
+      sendMessage(res, result.message);
     }
   );
 
@@ -129,17 +117,7 @@ export class AuthController {
    */
   requestEmailVerification = asyncHandler(async (req: Request, res: Response) => {
     const result = await authService.requestEmailVerification(req.user!.id);
-
-    // In production, send email instead of returning token
-    if (process.env.NODE_ENV === 'development') {
-      sendSuccess(res, {
-        message: 'Verification email sent',
-        devToken: result.token,
-        expiresAt: result.expiresAt,
-      });
-    } else {
-      sendMessage(res, 'Verification email sent');
-    }
+    sendMessage(res, result.message);
   });
 
   /**

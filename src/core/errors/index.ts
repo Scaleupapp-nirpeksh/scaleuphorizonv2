@@ -8,6 +8,7 @@ export {
   UnprocessableEntityError,
   TooManyRequestsError,
   InternalServerError,
+  InternalServerError as InternalError,
   ServiceUnavailableError,
   ValidationError,
   DatabaseError,

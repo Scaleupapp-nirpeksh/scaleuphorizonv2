@@ -59,6 +59,11 @@ declare global {
       organizationRole?: string;
 
       /**
+       * Shorthand for organization.id (set by org middleware)
+       */
+      organizationId?: string;
+
+      /**
        * Request ID for tracing
        */
       requestId?: string;

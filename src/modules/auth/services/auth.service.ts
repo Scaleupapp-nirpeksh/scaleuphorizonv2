@@ -6,6 +6,7 @@ import {
   NotFoundError,
   ConflictError,
 } from '@/core/errors';
+import { emailService } from '@/core/services';
 import type { AuthResult, TokenPair } from '../types';
 import type {
   RegisterInput,
@@ -48,6 +49,13 @@ export class AuthService {
     // Update last login
     user.lastLoginAt = new Date();
     await user.save();
+
+    // Send welcome email (non-blocking)
+    if (emailService.isConfigured()) {
+      emailService
+        .sendWelcome(user.email, user.firstName)
+        .catch((err) => console.error('Failed to send welcome email:', err));
+    }
 
     return {
       user: this.sanitizeUser(user),
@@ -214,11 +222,14 @@ export class AuthService {
   /**
    * Request password reset
    */
-  async forgotPassword(email: string): Promise<{ token: string; expiresAt: Date }> {
+  async forgotPassword(email: string): Promise<{ message: string }> {
     const user = await User.findOne({ email: email.toLowerCase() });
+
+    // Always return success message to prevent email enumeration
+    const successMessage = 'If the email exists, a reset link will be sent';
+
     if (!user) {
-      // Don't reveal if user exists
-      throw new NotFoundError('If the email exists, a reset link will be sent');
+      return { message: successMessage };
     }
 
     // Generate reset token
@@ -230,10 +241,17 @@ export class AuthService {
     user.passwordResetExpires = new Date(Date.now() + 60 * 60 * 1000);
     await user.save({ validateBeforeSave: false });
 
-    return {
-      token: resetToken,
-      expiresAt: user.passwordResetExpires,
-    };
+    // Send password reset email
+    if (emailService.isConfigured()) {
+      try {
+        await emailService.sendPasswordReset(user.email, resetToken, user.firstName);
+      } catch (err) {
+        console.error('Failed to send password reset email:', err);
+        // Don't fail the request if email fails
+      }
+    }
+
+    return { message: successMessage };
   }
 
   /**
@@ -266,7 +284,7 @@ export class AuthService {
   /**
    * Request email verification
    */
-  async requestEmailVerification(userId: string): Promise<{ token: string; expiresAt: Date }> {
+  async requestEmailVerification(userId: string): Promise<{ message: string }> {
     const user = await User.findById(userId);
     if (!user) {
       throw new NotFoundError('User not found');
@@ -285,10 +303,17 @@ export class AuthService {
     user.emailVerificationExpires = new Date(Date.now() + 24 * 60 * 60 * 1000);
     await user.save({ validateBeforeSave: false });
 
-    return {
-      token: verificationToken,
-      expiresAt: user.emailVerificationExpires,
-    };
+    // Send verification email
+    if (emailService.isConfigured()) {
+      try {
+        await emailService.sendEmailVerification(user.email, verificationToken, user.firstName);
+      } catch (err) {
+        console.error('Failed to send verification email:', err);
+        throw new BadRequestError('Failed to send verification email. Please try again.');
+      }
+    }
+
+    return { message: 'Verification email sent successfully' };
   }
 
   /**

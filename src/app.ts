@@ -24,6 +24,7 @@ import { fundraisingRoutes } from '@/modules/fundraising';
 import { reportingRoutes } from '@/modules/reporting';
 import { operationsRoutes } from '@/modules/operations';
 import { intelligenceRoutes } from '@/modules/intelligence';
+import { uploadRoutes } from '@/modules/uploads';
 
 /**
  * Create and configure Express application
@@ -143,13 +144,14 @@ export const createApp = (): Application => {
   app.use(`/api/${config.apiVersion}/reporting`, reportingRoutes);
   app.use(`/api/${config.apiVersion}/operations`, operationsRoutes);
   app.use(`/api/${config.apiVersion}/intelligence`, intelligenceRoutes);
+  app.use(`/api/${config.apiVersion}/uploads`, uploadRoutes);
 
   // Module status endpoint
   app.get(`/api/${config.apiVersion}/modules`, (_req, res) => {
     res.status(HttpStatus.OK).json({
       success: true,
       data: {
-        active: ['auth', 'organization', 'chart-of-accounts', 'planning', 'tracking', 'projection', 'analysis', 'fundraising', 'reporting', 'operations', 'intelligence'],
+        active: ['auth', 'organization', 'chart-of-accounts', 'planning', 'tracking', 'projection', 'analysis', 'fundraising', 'reporting', 'operations', 'intelligence', 'uploads'],
         planned: [],
       },
     });

@@ -134,6 +134,9 @@ export const requireOrganization = asyncHandler(
         slug: '',
       };
 
+      // Set shorthand
+      req.organizationId = organizationId;
+
       req.membership = {
         id: membership._id.toString(),
         role: membership.role as 'owner' | 'admin' | 'member' | 'viewer',

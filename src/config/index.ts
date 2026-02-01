@@ -29,10 +29,13 @@ const envSchema = z.object({
   AWS_REGION: z.string().default('ap-south-1'),
   S3_BUCKET_NAME: z.string().optional(),
 
-  // Email (optional)
-  SENDGRID_API_KEY: z.string().optional(),
-  FROM_EMAIL: z.string().email().optional(),
-  FROM_NAME: z.string().default('ScaleUp Horizon'),
+  // Email (SMTP - optional)
+  EMAIL_HOST: z.string().optional(),
+  EMAIL_PORT: z.string().transform(Number).optional(),
+  EMAIL_USER: z.string().optional(),
+  EMAIL_PASS: z.string().optional(),
+  EMAIL_FROM: z.string().email().optional(),
+  EMAIL_FROM_NAME: z.string().default('ScaleUp Horizon'),
 
   // Rate Limiting
   RATE_LIMIT_WINDOW_MS: z.string().transform(Number).default('900000'),
@@ -94,10 +97,15 @@ export const config = {
   },
 
   email: {
-    sendgridApiKey: env.SENDGRID_API_KEY,
-    fromEmail: env.FROM_EMAIL,
-    fromName: env.FROM_NAME,
+    host: env.EMAIL_HOST,
+    port: env.EMAIL_PORT,
+    user: env.EMAIL_USER,
+    pass: env.EMAIL_PASS,
+    from: env.EMAIL_FROM,
+    fromName: env.EMAIL_FROM_NAME,
   },
+
+  frontendUrl: env.FRONTEND_URL,
 
   rateLimit: {
     windowMs: env.RATE_LIMIT_WINDOW_MS,
