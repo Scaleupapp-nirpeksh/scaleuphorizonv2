@@ -20,8 +20,10 @@ const envSchema = z.object({
   JWT_ACCESS_EXPIRY: z.string().default('15m'),
   JWT_REFRESH_EXPIRY: z.string().default('7d'),
 
-  // Frontend
-  FRONTEND_URL: z.string().url().default('http://localhost:3000'),
+  // Frontend (comma-separated for multiple origins)
+  FRONTEND_URL: z.string().default('http://localhost:3000'),
+  // Additional CORS origins (comma-separated)
+  CORS_ORIGINS: z.string().optional(),
 
   // AWS (optional)
   AWS_ACCESS_KEY_ID: z.string().optional(),
@@ -86,7 +88,11 @@ export const config = {
   },
 
   cors: {
-    origin: env.FRONTEND_URL,
+    // Parse comma-separated origins into array
+    origins: [
+      env.FRONTEND_URL,
+      ...(env.CORS_ORIGINS ? env.CORS_ORIGINS.split(',').map(s => s.trim()) : []),
+    ].filter(Boolean),
   },
 
   aws: {

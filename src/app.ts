@@ -38,10 +38,25 @@ export const createApp = (): Application => {
   // Security middleware
   app.use(helmet());
 
-  // CORS
+  // CORS - supports multiple origins
   app.use(
     cors({
-      origin: config.cors.origin,
+      origin: (origin, callback) => {
+        // Allow requests with no origin (mobile apps, curl, etc.)
+        if (!origin) {
+          return callback(null, true);
+        }
+        // Check if origin is in allowed list or matches lovable.app pattern
+        const isAllowed =
+          config.cors.origins.includes(origin) ||
+          origin.endsWith('.lovable.app') ||
+          origin.includes('localhost');
+        if (isAllowed) {
+          callback(null, true);
+        } else {
+          callback(new Error(`Origin ${origin} not allowed by CORS`));
+        }
+      },
       credentials: true,
       methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
       allowedHeaders: ['Content-Type', 'Authorization', 'X-Request-ID', 'X-Organization-Id'],

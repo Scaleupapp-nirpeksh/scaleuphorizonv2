@@ -116,7 +116,7 @@ export class OrganizationController {
 
       // Include invitation URL in development
       if (config.isDevelopment) {
-        response.invitationUrl = `${config.cors.origin}/invite/${invitationToken}`;
+        response.invitationUrl = `${config.frontendUrl}/invite/${invitationToken}`;
       }
 
       sendCreated(res, response, 'Invitation sent successfully');
