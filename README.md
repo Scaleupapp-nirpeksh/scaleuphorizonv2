@@ -1,456 +1,181 @@
-ScaleUp Horizon v2.0 - Enhanced Financial Intelligence Platform 🚀
-🌟 New Features Overview
-1. ML-Powered Transaction Categorization
-Automatically categorizes expenses and revenue using Natural Language Processing
-Learns from corrections to improve accuracy over time
-Supports Indian vendors and payment methods
-95%+ accuracy after initial training
-2. Bank Statement Import & Reconciliation
-Import statements from HDFC, ICICI, SBI, Axis banks
-Automatic transaction matching with expenses/revenue
-Smart reconciliation with fuzzy matching
-Duplicate detection and prevention
-3. Custom KPI Builder
-Create any KPI with drag-and-drop formula builder
-Built-in KPIs: Burn Rate, Runway, LTV:CAC, Growth Rate
-Real-time calculations with historical tracking
-Visual dashboards with alerts
-4. Recurring Transactions
-Automatic creation of recurring expenses/revenue
-Flexible scheduling (daily, weekly, monthly, custom)
-Variable amount support with ranges
-Notification system for upcoming transactions
-5. Automated Report Generation
-Pre-built templates for investor updates, board reports
-Scheduled generation (weekly, monthly, quarterly)
-Multiple output formats (PDF, HTML, DOCX)
-Email distribution with tracking
-6. Advanced ML Analytics
-Expense prediction for next 30-90 days
-Anomaly detection for unusual transactions
-Cash flow optimization recommendations
-Spending pattern analysis
-🚀 Quick Start
-Installation
-bash
+# ScaleUp Horizon Backend v3.0
+
+A comprehensive financial management platform backend for startups, built with TypeScript, Express.js, and MongoDB.
+
+## Architecture
+
+This project uses a **modular architecture** where each feature is self-contained with its own models, controllers, services, routes, and validation schemas.
+
+```
+src/
+├── config/           # Application configuration
+├── core/             # Shared infrastructure
+│   ├── middleware/   # Auth, error handling, validation
+│   ├── database/     # MongoDB connection
+│   ├── errors/       # Custom error classes
+│   ├── types/        # Shared TypeScript types
+│   ├── utils/        # Common utilities
+│   └── constants/    # App-wide constants
+├── modules/          # Feature modules
+│   ├── auth/         # Authentication & Users
+│   ├── organization/ # Multi-tenancy
+│   ├── chart-of-accounts/  # Financial taxonomy
+│   ├── planning/     # Budget, Headcount, Revenue Planning
+│   ├── tracking/     # Transactions, Expenses, Revenue
+│   ├── fundraising/  # Rounds, Investors, Cap Table
+│   ├── operations/   # Tasks, Milestones, Meetings
+│   ├── reporting/    # Dashboards, Reports
+│   └── intelligence/ # AI/ML Features (Copilot, Categorization)
+├── app.ts            # Express app setup
+└── server.ts         # Entry point
+```
+
+## Tech Stack
+
+- **Runtime:** Node.js 16+
+- **Language:** TypeScript
+- **Framework:** Express.js
+- **Database:** MongoDB with Mongoose ODM
+- **Validation:** Zod with OpenAPI integration
+- **Authentication:** JWT (Access + Refresh tokens)
+- **AI Integration:** OpenAI GPT-4o
+- **Documentation:** OpenAPI/Swagger
+
+## Getting Started
+
+### Prerequisites
+
+- Node.js 16 or higher
+- MongoDB 6.0 or higher
+- npm or yarn
+
+### Installation
+
+```bash
 # Clone the repository
-git clone https://github.com/scaleup/horizon-backend.git
-cd horizon-backend
+git clone https://github.com/Scaleupapp-nirpeksh/scaleuphorizonv2.git
+cd scaleuphorizonv2
 
 # Install dependencies
 npm install
 
-# Set up environment variables
+# Copy environment file
 cp .env.example .env
+
 # Edit .env with your configuration
+```
 
-# Initialize database
-npm run migrate
+### Environment Variables
 
-# Start the server
-npm run dev
-Environment Variables
-env
+```env
+# Server
+NODE_ENV=development
+PORT=5000
+API_VERSION=v1
+
 # Database
-HORIZON_MONGODB_URI=mongodb://localhost:27017/scaleup-horizon
+MONGODB_URI=mongodb://localhost:27017/scaleup_horizon
 
 # Authentication
-HORIZON_JWT_SECRET=your-super-secret-jwt-key
+JWT_SECRET=your-jwt-secret
+JWT_EXPIRES_IN=15m
+JWT_REFRESH_SECRET=your-refresh-secret
+JWT_REFRESH_EXPIRES_IN=7d
 
-# AWS (for file storage)
-HORIZON_AWS_ACCESS_KEY_ID=your-aws-access-key
-HORIZON_AWS_SECRET_ACCESS_KEY=your-aws-secret-key
-HORIZON_AWS_REGION=ap-south-1
-HORIZON_S3_BUCKET_NAME=scaleup-horizon-documents
+# OpenAI (for Intelligence module)
+OPENAI_API_KEY=your-openai-api-key
+```
 
-# Email (for notifications)
-SENDGRID_API_KEY=your-sendgrid-api-key
-FROM_EMAIL=notifications@scaleup.com
+### Running the Server
 
-# Frontend URL
-FRONTEND_URL=http://localhost:3000
+```bash
+# Development mode (with hot reload)
+npm run dev
 
-# Port
-HORIZON_PORT=5001
-📚 API Documentation
-Transaction Categorization
-Auto-categorize Transaction
-http
-POST /api/horizon/enhanced/transactions/categorize
-Authorization: Bearer <token>
-Content-Type: application/json
+# Production build
+npm run build
+npm start
 
-{
-  "description": "Payment to AWS for cloud services",
-  "amount": 45000,
-  "vendor": "Amazon Web Services"
-}
+# Run tests
+npm test
+```
 
-Response:
-{
-  "category": "Tech Infrastructure",
-  "confidence": 0.95,
-  "allScores": [
-    { "category": "Tech Infrastructure", "score": 0.95 },
-    { "category": "Software & Subscriptions", "score": 0.03 }
-  ],
-  "requiresReview": false
-}
-Train Model with Correction
-http
-POST /api/horizon/enhanced/transactions/:id/correct-category
-Authorization: Bearer <token>
-Content-Type: application/json
+## API Documentation
 
-{
-  "correctCategory": "Software & Subscriptions"
-}
-Bank Sync
-Import Bank Statement
-http
-POST /api/horizon/enhanced/bank/import
-Authorization: Bearer <token>
-Content-Type: multipart/form-data
+- **Swagger UI:** http://localhost:5000/api/v1/docs
+- **OpenAPI JSON:** http://localhost:5000/api/v1/docs.json
+- **Health Check:** http://localhost:5000/health
 
-Fields:
-- statement: CSV file
-- bankAccountId: "64a1b2c3d4e5f6789"
-- bankFormat: "hdfc" | "icici" | "sbi" | "axis" | "generic"
+## Modules
 
-Response:
-{
-  "success": true,
-  "importBatchId": "IMPORT_1234567890_abc123",
-  "imported": 156,
-  "errors": 2,
-  "summary": {
-    "totalDebits": 2450000,
-    "totalCredits": 180000,
-    "dateRange": {
-      "from": "2025-04-01",
-      "to": "2025-04-30"
-    }
-  }
-}
-Custom KPIs
-Create Custom KPI
-http
-POST /api/horizon/enhanced/kpis/custom
-Authorization: Bearer <token>
-Content-Type: application/json
+### Core Modules
 
-{
-  "name": "customer_acquisition_efficiency",
-  "displayName": "Customer Acquisition Efficiency",
-  "category": "Sales",
-  "formula": "(new_customers / marketing_spend) * 1000",
-  "formulaVariables": [
-    {
-      "variable": "new_customers",
-      "source": "custom_metric",
-      "aggregation": "count",
-      "timeframe": "current_month"
-    },
-    {
-      "variable": "marketing_spend",
-      "source": "expense",
-      "filter": {
-        "field": "category",
-        "operator": "equals",
-        "value": "Marketing & Sales"
-      },
-      "aggregation": "sum",
-      "timeframe": "current_month"
-    }
-  ],
-  "displayFormat": {
-    "type": "number",
-    "decimals": 2,
-    "suffix": " customers/lakh"
-  },
-  "targets": [
-    {
-      "period": "2025-05",
-      "value": 50,
-      "type": "min"
-    }
-  ]
-}
-Get KPI Dashboard
-http
-GET /api/horizon/enhanced/kpis/dashboard
-Authorization: Bearer <token>
+| Module | Description | Base Route |
+|--------|-------------|------------|
+| Auth | User authentication, JWT tokens | `/api/v1/auth` |
+| Organization | Multi-tenancy, memberships | `/api/v1/organizations` |
+| Chart of Accounts | Financial categorization | `/api/v1/chart-of-accounts` |
 
-Response:
-{
-  "categories": {
-    "Financial": [
-      {
-        "id": "64a1b2c3d4e5f6789",
-        "name": "Monthly Burn Rate",
-        "value": 2450000,
-        "formattedValue": "₹24.5L",
-        "trend": -8.5,
-        "target": 2000000,
-        "visualization": {
-          "chartType": "gauge",
-          "color": "#F53F6E"
-        }
-      }
-    ]
-  },
-  "summary": {
-    "total": 12,
-    "improving": 7,
-    "declining": 3,
-    "onTarget": 8,
-    "offTarget": 4
-  }
-}
-Recurring Transactions
-Create Recurring Transaction
-http
-POST /api/horizon/enhanced/recurring-transactions
-Authorization: Bearer <token>
-Content-Type: application/json
+### Financial Modules
 
-{
-  "name": "AWS Monthly Bill",
-  "type": "expense",
-  "amount": 45000,
-  "isVariableAmount": true,
-  "amountVariation": {
-    "type": "percentage",
-    "value": 10
-  },
-  "category": "Tech Infrastructure",
-  "vendor": "Amazon Web Services",
-  "frequency": "monthly",
-  "dayOfMonth": 1,
-  "startDate": "2025-06-01",
-  "autoCreate": true,
-  "notifications": {
-    "enabled": true,
-    "daysBefore": 3
-  }
-}
-Get Upcoming Transactions
-http
-GET /api/horizon/enhanced/recurring-transactions/upcoming?days=30
-Authorization: Bearer <token>
+| Module | Description | Base Route |
+|--------|-------------|------------|
+| Planning | Budgets, Headcount, Revenue Plans | `/api/v1/planning` |
+| Tracking | Transactions, Expenses, Revenue | `/api/v1/tracking` |
+| Fundraising | Rounds, Investors, Cap Table, ESOP | `/api/v1/fundraising` |
 
-Response:
-{
-  "upcoming": [
-    {
-      "date": "2025-05-25",
-      "transactions": [
-        {
-          "recurringId": "64a1b2c3d4e5f6789",
-          "name": "Office Rent",
-          "type": "expense",
-          "amount": 150000,
-          "category": "Rent & Utilities",
-          "requiresApproval": false
-        }
-      ],
-      "totalExpenses": 150000,
-      "totalRevenue": 0
-    }
-  ],
-  "summary": {
-    "totalUpcoming": 28,
-    "totalExpenses": 3450000,
-    "totalRevenue": 500000,
-    "requiresApproval": 2
-  }
-}
-Report Generation
-Generate Report
-http
-POST /api/horizon/enhanced/reports/generate
-Authorization: Bearer <token>
-Content-Type: application/json
+### Operations & Intelligence
 
-{
-  "templateId": "64a1b2c3d4e5f6789",
-  "periodStart": "2025-05-01",
-  "periodEnd": "2025-05-31"
-}
+| Module | Description | Base Route |
+|--------|-------------|------------|
+| Operations | Tasks, Milestones, Meetings | `/api/v1/operations` |
+| Reporting | Dashboards, Investor Reports | `/api/v1/reporting` |
+| Intelligence | AI Copilot, Smart Categorization | `/api/v1/intelligence` |
 
-Response:
-{
-  "_id": "64b2c3d4e5f67890",
-  "title": "May 2025 Investor Update",
-  "reportType": "investor_update",
-  "content": {
-    "sections": [...],
-    "summary": "Strong revenue growth of 25% with improving unit economics.",
-    "highlights": [
-      "Achieved ₹25L in revenue",
-      "Reduced CAC by 30%",
-      "12 KPIs meeting targets"
-    ]
-  },
-  "files": [
-    {
-      "format": "pdf",
-      "url": "https://s3.ap-south-1.amazonaws.com/scaleup-horizon/reports/...",
-      "size": 245678
-    }
-  ]
-}
-ML Analytics
-Predict Expenses
-http
-GET /api/horizon/enhanced/ml/predict-expenses?days=30
-Authorization: Bearer <token>
+## Documentation
 
-Response:
-[
-  {
-    "date": "2025-05-24",
-    "predictedAmount": 85000,
-    "confidence": 0.92
-  },
-  {
-    "date": "2025-05-25",
-    "predictedAmount": 42000,
-    "confidence": 0.89
-  }
-]
-Optimize Cash Flow
-http
-POST /api/horizon/enhanced/ml/optimize-cashflow
-Authorization: Bearer <token>
-Content-Type: application/json
+Detailed API documentation for each module is available in the `docs/api/` folder:
 
-{
-  "currentState": {
-    "currentCash": 5000000,
-    "monthlyBurn": 2500000,
-    "upcomingExpenses": {...},
-    "expectedRevenue": {...}
-  },
-  "constraints": {
-    "minCashBalance": 1000000,
-    "maxPaymentDelay": 30
-  }
-}
+- [01-auth.md](docs/api/01-auth.md) - Authentication
+- [02-organization.md](docs/api/02-organization.md) - Organizations
+- [03-chart-of-accounts.md](docs/api/03-chart-of-accounts.md) - Chart of Accounts
+- [04-planning.md](docs/api/04-planning.md) - Financial Planning
+- [05-tracking.md](docs/api/05-tracking.md) - Financial Tracking
+- [08-fundraising.md](docs/api/08-fundraising.md) - Fundraising
+- [10-operations.md](docs/api/10-operations.md) - Operations
+- [11-intelligence.md](docs/api/11-intelligence.md) - AI Intelligence
 
-Response:
-{
-  "recommendations": [
-    {
-      "type": "payment_timing",
-      "category": "Marketing & Sales",
-      "action": "delay",
-      "days": 15,
-      "impact": "high",
-      "description": "Delay Marketing & Sales payments by 15 days to optimize cash flow"
-    },
-    {
-      "type": "expense_reduction",
-      "category": "Software & Subscriptions",
-      "percentage": "12.5",
-      "impact": "medium",
-      "description": "Reduce Software & Subscriptions expenses by 12.5% to improve runway"
-    }
-  ],
-  "projectedImpact": {
-    "runwayExtension": 1.8,
-    "cashFlowImprovement": 450000,
-    "riskReduction": 23.5
-  }
-}
-🎯 Best Practices
-1. Initial Setup
-Import at least 3 months of bank statements for better categorization
-Set up all recurring transactions to avoid manual entry
-Configure KPIs relevant to your business model
-Create report templates for regular updates
-2. Daily Usage
-Review and correct any miscategorized transactions
-Check anomaly alerts for unusual spending
-Monitor KPI dashboard for trends
-Approve pending recurring transactions
-3. Weekly Tasks
-Import latest bank statements
-Review cash flow predictions
-Check upcoming recurring transactions
-Generate weekly reports if configured
-4. Monthly Tasks
-Reconcile all bank accounts
-Review and update KPI targets
-Generate investor updates
-Analyze spending patterns
-🔧 Troubleshooting
-Common Issues
-Categorization Accuracy Low
-Solution: Correct more transactions to train the model
-Use bulk categorization for historical data
-Bank Import Fails
-Check CSV format matches the selected bank
-Ensure date format is correct
-Remove any header/footer rows
-KPI Not Calculating
-Verify all formula variables have data
-Check timeframe settings
-Ensure dependent KPIs are calculated first
-Reports Not Generating
-Check template configuration
-Verify data exists for the period
-Check S3 permissions for file storage
-🚦 Performance Tips
-Database Indexes
-javascript
-// Add these indexes for better performance
-db.expenses.createIndex({ date: -1, category: 1 })
-db.banktransactions.createIndex({ bankAccountId: 1, date: -1 })
-db.customkpis.createIndex({ createdBy: 1, isActive: 1 })
-Caching
-KPI values are cached for 1 hour
-Report templates are cached in memory
-ML model predictions are cached for 24 hours
-Batch Operations
-Use bulk APIs for importing transactions
-Schedule heavy operations during off-peak hours
-Limit report generation to 5 concurrent jobs
-🛡️ Security
-API Rate Limiting
-100 requests per minute per user
-1000 requests per hour per user
-Bulk operations count as 10 requests
-Data Encryption
-All bank data encrypted at rest
-SSL/TLS for all API communications
-Sensitive fields encrypted in database
-Access Control
-JWT tokens expire after 5 hours
-Role-based permissions (coming soon)
-Audit logs for all modifications
-📈 Roadmap
-Coming Soon (v2.1)
- Multi-user support with roles
- Mobile app
- Direct bank API integration
- Advanced forecasting models
- Industry benchmarking
-Future (v3.0)
- AI-powered insights
- Automated fundraising assistance
- Integration with accounting software
- Blockchain-based audit trail
- International currency support
-🤝 Contributing
-We welcome contributions! Please see CONTRIBUTING.md for guidelines.
+## Project Structure
 
-📄 License
-This project is licensed under the ISC License - see LICENSE.md for details.
+Each module follows this internal structure:
 
-🆘 Support
-Email: support@scaleup.com
-Documentation: https://docs.scaleup.com/horizon
-Community: https://community.scaleup.com
-Built with ❤️ by the ScaleUp Team for startup founders worldwide!
+```
+modules/<module-name>/
+├── models/           # Mongoose schemas
+├── controllers/      # Request handlers
+├── services/         # Business logic
+├── routes/           # Express routes with OpenAPI
+├── schemas/          # Zod validation schemas
+├── types/            # Module-specific types
+├── constants/        # Module constants
+└── index.ts          # Module exports
+```
 
+## Scripts
+
+```bash
+npm run dev          # Start development server
+npm run build        # Build for production
+npm start            # Start production server
+npm test             # Run tests
+npm run lint         # Run ESLint
+npm run seed         # Seed database with sample data
+```
+
+## License
+
+Private - All rights reserved
+
+## Support
+
+For support, contact the development team.
